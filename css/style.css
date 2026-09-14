@@ -423,13 +423,20 @@ a:hover { color: var(--accent-hover); }
   line-height: 0;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 #previewCanvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
   max-width: 100%;
   height: auto;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 .preview-info {

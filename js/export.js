@@ -7,7 +7,6 @@ const Exporter = {
     exportCanvas.width = w;
     exportCanvas.height = h;
     const ctx = exportCanvas.getContext('2d');
-
     ctx.imageSmoothingEnabled = false;
 
     this.drawBackgroundExport(ctx, state, scale);
@@ -33,8 +32,7 @@ const Exporter = {
     ctx.save();
 
     if (shape === 'pill') {
-      const r = h / 2;
-      CanvasRenderer.roundRect(ctx, 0, 0, w, h, r);
+      CanvasRenderer.roundRect(ctx, 0, 0, w, h, h / 2);
       ctx.clip();
     } else if (shape === 'rounded' && borderRadius > 0) {
       CanvasRenderer.roundRect(ctx, 0, 0, w, h, borderRadius * scale);
@@ -43,10 +41,8 @@ const Exporter = {
 
     if (bgType === 'gradient') {
       const grad = ctx.createLinearGradient(0, 0, w, h);
-      const c1 = CanvasRenderer.hexToRgba(bgColor, alpha);
-      const c2 = CanvasRenderer.hexToRgba(CanvasRenderer.darkenColor(bgColor, 0.3), alpha);
-      grad.addColorStop(0, c1);
-      grad.addColorStop(1, c2);
+      grad.addColorStop(0, CanvasRenderer.hexToRgba(bgColor, alpha));
+      grad.addColorStop(1, CanvasRenderer.hexToRgba(CanvasRenderer.darkenColor(bgColor, 0.3), alpha));
       ctx.fillStyle = grad;
     } else {
       ctx.fillStyle = CanvasRenderer.hexToRgba(bgColor, alpha);
@@ -101,6 +97,8 @@ const Exporter = {
     const fontStr = `${fontStyle}${scaledFontSize}px ${CanvasRenderer.getFontFamily(font)}`;
     ctx.font = fontStr;
     ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    ctx.imageSmoothingEnabled = false;
 
     const metrics = ctx.measureText(text);
     const textW = metrics.width;
@@ -126,12 +124,16 @@ const Exporter = {
       : startX + (iconEnabled && iconData ? iconW + iconSpacingScaled : 0);
     const textY = startY + paddingT * scale;
 
+    const fillGrad = gradient
+      ? this.getGradient(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir)
+      : null;
+
     if (glow) {
       ctx.save();
       ctx.shadowColor = glowColor;
       ctx.shadowBlur = glowStrength * scale;
       ctx.globalAlpha = glowOpacity / 100;
-      ctx.fillStyle = gradient ? this.getGradient(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir) : textColor;
+      ctx.fillStyle = fillGrad || textColor;
       ctx.fillText(text, textX, textY);
       ctx.restore();
     }
@@ -151,24 +153,20 @@ const Exporter = {
       ctx.save();
       ctx.strokeStyle = outlineColor;
       ctx.lineWidth = outlineSize * 2 * scale;
-      ctx.lineJoin = 'round';
+      ctx.lineJoin = 'miter';
       ctx.miterLimit = 2;
       ctx.strokeText(text, textX, textY);
       ctx.restore();
     }
 
     ctx.save();
-    if (gradient) {
-      ctx.fillStyle = this.getGradient(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir);
-    } else {
-      ctx.fillStyle = textColor;
-    }
+    ctx.fillStyle = fillGrad || textColor;
     ctx.fillText(text, textX, textY);
     ctx.restore();
 
     if (underline) {
       ctx.save();
-      ctx.fillStyle = gradient ? this.getGradient(ctx, gradientColor1, gradientColor2, textX, textY + textH - scale, textW, scale, gradientDir) : textColor;
+      ctx.fillStyle = fillGrad || textColor;
       ctx.fillRect(textX, textY + textH - scale, textW, scale);
       ctx.restore();
     }

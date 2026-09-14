@@ -7,13 +7,18 @@ const CanvasRenderer = {
 
   init(canvasId) {
     this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d', { willReadFrequently: false });
     this.setupOffscreen();
   },
 
   setupOffscreen() {
     this.offscreen = document.createElement('canvas');
-    this.offCtx = this.offscreen.getContext('2d');
+    this.offCtx = this.offscreen.getContext('2d', { willReadFrequently: false });
+  },
+
+  disableSmoothing(ctx) {
+    ctx.imageSmoothingEnabled = false;
+    ctx.textRendering = 'optimizeSpeed';
   },
 
   setCanvasSize(w, h) {
@@ -33,15 +38,12 @@ const CanvasRenderer = {
   },
 
   render(state) {
-    const { canvasW, canvasH, pixelPerfect } = state;
+    const { canvasW, canvasH } = state;
     this.setCanvasSize(canvasW, canvasH);
 
     const ctx = this.offCtx;
     ctx.clearRect(0, 0, canvasW, canvasH);
-
-    if (pixelPerfect) {
-      ctx.imageSmoothingEnabled = false;
-    }
+    this.disableSmoothing(ctx);
 
     this.drawBackground(ctx, state);
     this.drawText(ctx, state);
@@ -50,10 +52,7 @@ const CanvasRenderer = {
     this.canvas.style.width = (canvasW * previewScale) + 'px';
     this.canvas.style.height = (canvasH * previewScale) + 'px';
 
-    if (pixelPerfect) {
-      this.ctx.imageSmoothingEnabled = false;
-    }
-
+    this.disableSmoothing(this.ctx);
     this.ctx.clearRect(0, 0, canvasW, canvasH);
     this.ctx.drawImage(this.offscreen, 0, 0);
   },
@@ -83,17 +82,14 @@ const CanvasRenderer = {
 
     if (bgType === 'gradient') {
       const grad = ctx.createLinearGradient(0, 0, canvasW, canvasH);
-      const c1 = this.hexToRgba(bgColor, alpha);
-      const c2 = this.hexToRgba(this.darkenColor(bgColor, 0.3), alpha);
-      grad.addColorStop(0, c1);
-      grad.addColorStop(1, c2);
+      grad.addColorStop(0, this.hexToRgba(bgColor, alpha));
+      grad.addColorStop(1, this.hexToRgba(this.darkenColor(bgColor, 0.3), alpha));
       ctx.fillStyle = grad;
     } else {
       ctx.fillStyle = this.hexToRgba(bgColor, alpha);
     }
 
     ctx.fillRect(0, 0, canvasW, canvasH);
-
     ctx.restore();
 
     if (borderEnabled && borderWidth > 0) {
@@ -130,7 +126,7 @@ const CanvasRenderer = {
       glow, glowColor, glowStrength, glowOpacity,
       gradient, gradientColor1, gradientColor2, gradientDir,
       paddingL, paddingR, paddingT, paddingB,
-      canvasW, canvasH, pixelPerfect,
+      canvasW, canvasH,
       iconEnabled, iconData, iconSize, iconPosition, iconSpacing
     } = state;
 
@@ -138,6 +134,8 @@ const CanvasRenderer = {
     const fontStr = `${fontStyle}${fontSize}px ${this.getFontFamily(font)}`;
     ctx.font = fontStr;
     ctx.textBaseline = 'top';
+    ctx.textAlign = 'left';
+    this.disableSmoothing(ctx);
 
     const metrics = ctx.measureText(text);
     const textW = metrics.width;
@@ -156,22 +154,24 @@ const CanvasRenderer = {
     let startX = Math.round((canvasW - totalW) / 2);
     let startY = Math.round((canvasH - totalH) / 2);
 
-    if (pixelPerfect) {
-      startX = Math.max(paddingL, startX);
-      startY = Math.max(paddingT, startY);
-    }
+    startX = Math.max(paddingL, startX);
+    startY = Math.max(paddingT, startY);
 
     const textX = iconPosition === 'right'
       ? startX
       : startX + (iconEnabled && iconData ? iconW + iconSpacingVal : 0);
     const textY = startY + paddingT;
 
+    const fillGrad = gradient
+      ? this.createGradientText(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir)
+      : null;
+
     if (glow) {
       ctx.save();
       ctx.shadowColor = glowColor;
       ctx.shadowBlur = glowStrength;
       ctx.globalAlpha = glowOpacity / 100;
-      ctx.fillStyle = gradient ? this.createGradientText(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir) : textColor;
+      ctx.fillStyle = fillGrad || textColor;
       ctx.fillText(text, textX, textY);
       ctx.restore();
     }
@@ -191,24 +191,20 @@ const CanvasRenderer = {
       ctx.save();
       ctx.strokeStyle = outlineColor;
       ctx.lineWidth = outlineSize * 2;
-      ctx.lineJoin = 'round';
+      ctx.lineJoin = 'miter';
       ctx.miterLimit = 2;
       ctx.strokeText(text, textX, textY);
       ctx.restore();
     }
 
     ctx.save();
-    if (gradient) {
-      ctx.fillStyle = this.createGradientText(ctx, gradientColor1, gradientColor2, textX, textY, textW, textH, gradientDir);
-    } else {
-      ctx.fillStyle = textColor;
-    }
+    ctx.fillStyle = fillGrad || textColor;
     ctx.fillText(text, textX, textY);
     ctx.restore();
 
     if (underline) {
       ctx.save();
-      ctx.fillStyle = gradient ? this.createGradientText(ctx, gradientColor1, gradientColor2, textX, textY + textH - 1, textW, 1, gradientDir) : textColor;
+      ctx.fillStyle = fillGrad || textColor;
       ctx.fillRect(textX, textY + textH - 1, textW, 1);
       ctx.restore();
     }
@@ -241,12 +237,7 @@ const CanvasRenderer = {
     } else {
       img.onload = function() {
         self.iconCache[iconData] = img;
-        const previewScale = self.getPreviewScale(self.canvas.width, self.canvas.height);
-        self.canvas.style.width = (self.canvas.width * previewScale) + 'px';
-        self.canvas.style.height = (self.canvas.height * previewScale) + 'px';
-        self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
-        self.ctx.imageSmoothingEnabled = false;
-        self.ctx.drawImage(self.offscreen, 0, 0);
+        self.render(self._lastState || {});
       };
     }
   },
