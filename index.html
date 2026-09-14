@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TagForge - Minecraft Tag Generator</title>
+  <meta name="description" content="Create professional Minecraft server tags, badges and rank icons. Export as PNG with transparency support.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Minecraft';
+      src: url('assets/fonts/minecraft.woff2') format('woff2'),
+           url('assets/fonts/minecraft.woff') format('woff'),
+           url('assets/fonts/minecraft.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-brand">
+      <div class="brand-icon" aria-hidden="true">⚒</div>
+      <span>TagForge</span>
+    </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" data-section="editor">Editor</a></li>
+      <li><a href="#" class="nav-link" data-section="presets">Presets</a></li>
+      <li><a href="#" class="nav-link" data-section="projects">Projects</a></li>
+      <li><a href="#" class="nav-link" data-section="about">About</a></li>
+    </ul>
+    <div class="nav-right"></div>
+  </nav>
+
+  <div class="app-container">
+    <aside class="sidebar" role="complementary" aria-label="Editor panel">
+      <div class="section active" id="section-editor">
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">✏</span> Tag Text</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="tagText">Text</label>
+            <input type="text" class="form-input" id="tagText" data-prop="text" value="YÖNETİCİ" placeholder="Enter tag text..." aria-label="Tag text">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="fontSelect">Font</label>
+              <select class="form-select" id="fontSelect" data-prop="font" data-type="select" aria-label="Font family"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fontSize">Size</label>
+              <input type="number" class="form-input" id="fontSize" data-prop="fontSize" data-type="number" value="8" min="4" max="128" aria-label="Font size">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">🎨</span> Colors</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Text Color</label>
+            <div class="color-input-wrap">
+              <input type="color" class="color-swatch" id="textColor" data-prop="textColor" data-type="color" value="#FFFFFF" aria-label="Text color picker">
+              <input type="text" class="form-input" id="textColorHex" data-hex="textColor" value="#FFFFFF" placeholder="#FFFFFF" style="flex:1" aria-label="Text color hex">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Minecraft Colors</label>
+            <div class="mc-colors" id="mcColorPalette" role="group" aria-label="Minecraft color palette"></div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="textOutline" data-prop="textOutline" data-type="checkbox" checked>
+              Text Outline
+            </label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="outlineColor">Outline Color</label>
+              <div class="color-input-wrap">
+                <input type="color" class="color-swatch" id="outlineColor" data-prop="outlineColor" data-type="color" value="#000000" aria-label="Outline color">
+                <input type="text" class="form-input" id="outlineColorHex" data-hex="outlineColor" value="#000000" style="flex:1" aria-label="Outline color hex">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="outlineSize">Outline Size</label>
+              <input type="number" class="form-input" id="outlineSize" data-prop="outlineSize" data-type="number" value="1" min="0" max="10" aria-label="Outline size">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="gradient" data-prop="gradient" data-type="checkbox">
+              Enable Gradient
+            </label>
+            <div class="gradient-fields" id="gradientFields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Color 1</label>
+                  <input type="color" class="color-swatch" id="gradientColor1" data-prop="gradientColor1" data-type="color" value="#FFFFFF" aria-label="Gradient color 1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Color 2</label>
+                  <input type="color" class="color-swatch" id="gradientColor2" data-prop="gradientColor2" data-type="color" value="#9B5CFF" aria-label="Gradient color 2">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="gradientDir">Direction</label>
+                <select class="form-select" id="gradientDir" data-prop="gradientDir" data-type="select" aria-label="Gradient direction">
+                  <option value="horizontal">Horizontal</option>
+                  <option value="vertical">Vertical</option>
+                  <option value="diagonal">Diagonal</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">✦</span> Effects</div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="bold" data-prop="bold" data-type="checkbox">
+              Bold
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="italic" data-prop="italic" data-type="checkbox">
+              Italic
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="underline" data-prop="underline" data-type="checkbox">
+              Underline
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="shadow" data-prop="shadow" data-type="checkbox">
+              Shadow
+            </label>
+            <div class="glow-fields" id="shadowFields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Shadow Color</label>
+                  <input type="color" class="color-swatch" id="shadowColor" data-prop="shadowColor" data-type="color" value="#000000" aria-label="Shadow color">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Shadow Blur</label>
+                  <input type="number" class="form-input" id="shadowBlur" data-prop="shadowBlur" data-type="number" value="2" min="0" max="20" aria-label="Shadow blur">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="glow" data-prop="glow" data-type="checkbox">
+              Glow
+            </label>
+            <div class="glow-fields" id="glowFields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Glow Color</label>
+                  <input type="color" class="color-swatch" id="glowColor" data-prop="glowColor" data-type="color" value="#9B5CFF" aria-label="Glow color">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Strength</label>
+                  <input type="number" class="form-input" id="glowStrength" data-prop="glowStrength" data-type="number" value="3" min="1" max="20" aria-label="Glow strength">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Opacity: <span id="glowOpacityDisplay">50</span>%</label>
+                <input type="range" id="glowOpacity" data-prop="glowOpacity" data-type="range" value="50" min="0" max="100" aria-label="Glow opacity">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">◐</span> Background</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bgType">Background Type</label>
+            <select class="form-select" id="bgType" data-prop="bgType" data-type="select" aria-label="Background type">
+              <option value="transparent">Transparent</option>
+              <option value="solid">Solid Color</option>
+              <option value="gradient">Gradient</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="bgColor">Background Color</label>
+            <div class="color-input-wrap">
+              <input type="color" class="color-swatch" id="bgColor" data-prop="bgColor" data-type="color" value="#000000" aria-label="Background color">
+              <input type="text" class="form-input" id="bgColorHex" data-hex="bgColor" value="#000000" style="flex:1" aria-label="Background color hex">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opacity: <span id="bgOpacityDisplay">100</span>%</label>
+            <input type="range" id="bgOpacity" data-prop="bgOpacity" data-type="range" value="100" min="0" max="100" aria-label="Background opacity">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">◻</span> Border / Shape</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="shape">Shape</label>
+            <select class="form-select" id="shape" data-prop="shape" data-type="select" aria-label="Tag shape">
+              <option value="none">None</option>
+              <option value="rectangle">Rectangle</option>
+              <option value="rounded">Rounded Rectangle</option>
+              <option value="pill">Pill</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="borderEnabled" data-prop="borderEnabled" data-type="checkbox">
+              Enable Border
+            </label>
+            <div id="borderFields">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Border Color</label>
+                  <input type="color" class="color-swatch" id="borderColor" data-prop="borderColor" data-type="color" value="#000000" aria-label="Border color">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Border Width</label>
+                  <input type="number" class="form-input" id="borderWidth" data-prop="borderWidth" data-type="number" value="1" min="0" max="10" aria-label="Border width">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group" id="radiusFields">
+            <label class="form-label">Corner Radius</label>
+            <input type="number" class="form-input" id="borderRadius" data-prop="borderRadius" data-type="number" value="0" min="0" max="50" aria-label="Corner radius">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">⊞</span> Padding</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="paddingL">Left</label>
+              <input type="number" class="form-input" id="paddingL" data-prop="paddingL" data-type="number" value="3" min="0" max="50" aria-label="Padding left">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="paddingR">Right</label>
+              <input type="number" class="form-input" id="paddingR" data-prop="paddingR" data-type="number" value="3" min="0" max="50" aria-label="Padding right">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="paddingT">Top</label>
+              <input type="number" class="form-input" id="paddingT" data-prop="paddingT" data-type="number" value="1" min="0" max="50" aria-label="Padding top">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="paddingB">Bottom</label>
+              <input type="number" class="form-input" id="paddingB" data-prop="paddingB" data-type="number" value="1" min="0" max="50" aria-label="Padding bottom">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">⬡</span> Canvas Size</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Presets</label>
+            <div class="form-row" id="sizePresets" style="flex-wrap:wrap;gap:4px;" role="group" aria-label="Canvas size presets"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="canvasW">Width</label>
+              <input type="number" class="form-input" id="canvasW" value="122" min="1" max="1024" aria-label="Canvas width">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="canvasH">Height</label>
+              <input type="number" class="form-input" id="canvasH" value="15" min="1" max="1024" aria-label="Canvas height">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="pixelPerfect" data-prop="pixelPerfect" data-type="checkbox" checked>
+              Pixel Perfect
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">★</span> Icon</div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="iconEnabled" data-prop="iconEnabled" data-type="checkbox">
+              Enable Icon
+            </label>
+          </div>
+          <div class="form-group" id="iconUploadArea">
+            <div class="icon-upload-area" id="iconUpload" role="button" tabindex="0" aria-label="Upload icon">
+              Click to upload PNG icon
+            </div>
+            <input type="file" id="iconFileInput" accept="image/png,image/*" style="display:none" aria-label="Icon file input">
+          </div>
+          <div class="icon-preview" id="iconPreview">
+            <img src="" alt="Icon preview">
+            <button class="btn btn-sm btn-danger" id="removeIcon" aria-label="Remove icon">Remove</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="iconSize">Icon Size</label>
+              <input type="number" class="form-input" id="iconSize" data-prop="iconSize" data-type="number" value="10" min="4" max="64" aria-label="Icon size">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="iconPosition">Position</label>
+              <select class="form-select" id="iconPosition" data-prop="iconPosition" data-type="select" aria-label="Icon position">
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="iconSpacing">Spacing</label>
+            <input type="number" class="form-input" id="iconSpacing" data-prop="iconSpacing" data-type="number" value="2" min="0" max="20" aria-label="Icon spacing">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="form-row" style="gap:8px">
+            <button class="btn btn-secondary" id="resetBtn" style="flex:1" aria-label="Reset editor">↺ Reset</button>
+            <button class="btn btn-secondary" id="saveProjectBtn" style="flex:1" aria-label="Save project">💾 Save</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section" id="section-presets">
+        <h2 class="section-title">Tag Presets</h2>
+        <div class="presets-grid" id="presetsGrid"></div>
+      </div>
+
+      <div class="section" id="section-projects">
+        <h2 class="section-title">Saved Projects</h2>
+        <div class="panel">
+          <div class="form-row" style="gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary" id="exportJsonBtn" style="flex:1" aria-label="Export project as JSON">📋 Export JSON</button>
+            <button class="btn btn-secondary" id="importJsonBtn" style="flex:1" aria-label="Import project from JSON">📂 Import JSON</button>
+          </div>
+          <input type="file" id="importJsonInput" accept=".json" style="display:none" aria-label="Import JSON file">
+        </div>
+        <div class="saved-projects" id="savedProjectsList"></div>
+      </div>
+
+      <div class="section" id="section-about">
+        <h2 class="section-title">About TagForge</h2>
+        <div class="panel about-content">
+          <p>TagForge is a browser-based tool for creating professional Minecraft server tags, badges, and rank icons.</p>
+          <h2>Features</h2>
+          <ul>
+            <li>Pixel-perfect rendering for small Minecraft tags</li>
+            <li>Transparent PNG export with alpha channel</li>
+            <li>Minecraft color codes support</li>
+            <li>Gradient text effects</li>
+            <li>Glow, shadow, and outline effects</li>
+            <li>Custom icon support</li>
+            <li>ItemsAdder compatible export</li>
+            <li>Save/load projects with localStorage</li>
+            <li>Export/import as JSON</li>
+            <li>Mobile responsive design</li>
+          </ul>
+          <h2>How to Use</h2>
+          <ol>
+            <li>Edit your tag text and styling in the editor</li>
+            <li>Preview the result in real-time on the canvas</li>
+            <li>Choose your desired canvas size</li>
+            <li>Export as PNG at 1x, 2x, or 4x scale</li>
+            <li>Use the exported PNG in your Minecraft resource pack</li>
+          </ol>
+          <h2>ItemsAdder Integration</h2>
+          <p>Click "Generate ItemsAdder Config" to create a configuration snippet for ItemsAdder. Enter your namespace and texture name, then copy the generated YAML.</p>
+          <h2>Privacy</h2>
+          <p>All processing happens locally in your browser. No images or data are sent to any server.</p>
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="main-content" role="main">
+      <div class="preview-container">
+        <div class="preview-wrapper">
+          <div class="checkerboard">
+            <div class="canvas-frame">
+              <canvas id="previewCanvas" aria-label="Tag preview canvas"></canvas>
+            </div>
+          </div>
+          <div class="preview-info">
+            <span>Dimensions: <span class="value" id="previewDimensions">122 × 15 px</span></span>
+          </div>
+          <div class="warning-text" id="fitWarning">
+            ⚠ Text does not fit inside the canvas. Consider increasing canvas size or decreasing font size.
+          </div>
+        </div>
+
+        <div class="panel export-section">
+          <div class="panel-header">
+            <div class="panel-title"><span class="icon">⤓</span> Export</div>
+            <span class="itemsadder-badge">✓ ItemsAdder Ready</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Scale</label>
+            <div class="export-options" role="radiogroup" aria-label="Export scale">
+              <div class="export-option export-scale-btn active" data-scale="1" role="radio" aria-checked="true" tabindex="0">
+                <div class="label">PNG</div>
+                <div class="desc">1x (Original)</div>
+              </div>
+              <div class="export-option export-scale-btn" data-scale="2" role="radio" aria-checked="false" tabindex="0">
+                <div class="label">PNG @2x</div>
+                <div class="desc">2x Scale</div>
+              </div>
+              <div class="export-option export-scale-btn" data-scale="4" role="radio" aria-checked="false" tabindex="0">
+                <div class="label">PNG @4x</div>
+                <div class="desc">4x Scale</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="export-info">
+            <div class="export-info-row">
+              <span class="label">Format</span>
+              <span class="value">PNG</span>
+            </div>
+            <div class="export-info-row">
+              <span class="label">Color</span>
+              <span class="value">RGBA</span>
+            </div>
+            <div class="export-info-row">
+              <span class="label">Transparency</span>
+              <span class="value">Supported</span>
+            </div>
+            <div class="export-info-row">
+              <span class="label">Recommended for</span>
+              <span class="value">ItemsAdder</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="exportFilename">Filename</label>
+            <input type="text" class="form-input" id="exportFilename" value="tag" placeholder="tag" aria-label="Export filename">
+          </div>
+
+          <button class="btn btn-primary btn-lg" id="downloadBtn" aria-label="Download PNG">
+            ⤓ DOWNLOAD PNG
+          </button>
+
+          <div style="margin-top:12px">
+            <button class="btn btn-secondary btn-lg" id="generateIaConfig" aria-label="Generate ItemsAdder config">
+              ⚙ Generate ItemsAdder Config
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="config-modal" id="iaConfigModal" role="dialog" aria-label="ItemsAdder Config Generator">
+    <div class="config-modal-content">
+      <h3>⚙ ItemsAdder Config Generator</h3>
+      <div class="form-group">
+        <label class="form-label" for="iaNamespace">Namespace</label>
+        <input type="text" class="form-input" id="iaNamespace" value="myplugin" placeholder="myplugin" aria-label="ItemsAdder namespace">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="iaTextureName">Texture Name</label>
+        <input type="text" class="form-input" id="iaTextureName" value="tag_admin" placeholder="tag_admin" aria-label="ItemsAdder texture name">
+      </div>
+      <button class="btn btn-primary" id="iaGenerateBtn" aria-label="Generate config">Generate</button>
+      <pre class="config-code" id="iaConfigOutput">Click Generate to create config...</pre>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="copyConfigBtn" aria-label="Copy config to clipboard">📋 Copy Config</button>
+        <button class="btn btn-secondary" id="closeModal" aria-label="Close modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/presets.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
